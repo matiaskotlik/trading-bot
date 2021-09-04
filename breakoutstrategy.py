@@ -1,0 +1,2 @@
+class BreakoutStrategy(Strategy):
+    pass

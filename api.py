@@ -1,9 +1,9 @@
 import os
 
-import cbpro
+from cbpro import AuthenticatedClient as CBProClient
 
 
-def connect() -> cbpro.AuthenticatedClient:
+def connect() -> CBProClient:
     """Authenticate to the cbpro API"""
 
     API_KEY = os.getenv('API_KEY')
@@ -18,4 +18,4 @@ def connect() -> cbpro.AuthenticatedClient:
     if API_PASSCODE == None:
         raise RuntimeError("API_PASSCODE environment variable is not set")
 
-    return cbpro.AuthenticatedClient(API_KEY, API_SECRET, API_PASSCODE)
+    return CBProClient(API_KEY, API_SECRET, API_PASSCODE)
