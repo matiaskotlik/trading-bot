@@ -8,6 +8,7 @@ from cbpro import AuthenticatedClient as CBProClient
 
 cache = diskcache.Cache(ROOT_DIR / 'cache')
 
+
 class Downloader:
     MAX_CANDLES = 300  # as per get_product_historic_rates docs
     ALLOWED_GRANULARITIES = [60, 300, 900, 3600, 21600,

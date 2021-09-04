@@ -12,19 +12,22 @@ class VolatileStrategy(Strategy):
     def trade(self, trader: Trader):
         product = self.find_volatile_tickers()[0]['id']
         # buy $10 of the most volatile product
-        trader.place_order(product, side=Side.BUY, order_type=OrderType.MARKET, price=10, time=self.now)
+        trader.place_order(product,
+                           side=Side.BUY,
+                           order_type=OrderType.MARKET,
+                           price=10,
+                           time=self.now)
 
     def download_data(self, downloader: Downloader):
         start = self.now - timedelta(hours=1)
         end = self.now
 
         self.products = [
-            p for p in downloader.product_list()
-            if p['id'].endswith('-USD')
+            p for p in downloader.product_list() if p['id'].endswith('-USD')
         ]  # filter only USD pairs
 
         self.product_data = {
-            p['id']:  downloader.historical_data(p['id'], start, end) 
+            p['id']: downloader.historical_data(p['id'], start, end)
             for p in self.products
         }
 

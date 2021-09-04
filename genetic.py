@@ -3,6 +3,7 @@ from __future__ import annotations
 from random import choice, randint, random, sample
 from statistics import NormalDist
 from typing import Callable, Optional, Tuple
+
 from utils import clamp, grouper  # allow type hints without ''
 
 
@@ -50,11 +51,11 @@ class GeneticAlgorithm:
             population, scores = self.run_single_iteration()
 
             # get best performing agent from population
-            agent, score = sorted(zip(population, scores), key = lambda x: x[1])[-1]
+            agent, score = sorted(zip(population, scores),
+                                  key=lambda x: x[1])[-1]
             if best == None or score > best[1]:
                 best = (agent, score)
         return best
-
 
     def run_single_iteration(self) -> Tuple[list[Agent], list[float]]:
         scores = [fitness(c) for c in self.population]
@@ -85,10 +86,7 @@ def create_candiate():
     return Agent([random() for i in range(10)])
 
 
-
-def tournament_selection(pop: list[Agent],
-                         scores: list[float],
-                         k=3) -> Agent:
+def tournament_selection(pop: list[Agent], scores: list[float], k=3) -> Agent:
     """
     Tournament selection algorithm. 
     Randomly pick k agents and return the best one as our winner.
@@ -134,6 +132,7 @@ def random_selection(pop: list[Agent]) -> Agent:
     """Random selection algorithm"""
     return choice(pop)
 
+
 if __name__ == '__main__':
 
     def fitness(agent: Agent) -> float:
@@ -141,9 +140,9 @@ if __name__ == '__main__':
         genes = [g.value for g in agent.genes]
         lhs, rhs = genes[:middle], genes[middle:]
         return sum(lhs) - sum(rhs)
+
     simulation = GeneticAlgorithm(
-        fitness, [Agent([Gene() for _ in range(10)]) for _ in range(50)]
-    )
+        fitness, [Agent([Gene() for _ in range(10)]) for _ in range(50)])
 
     iterations = 1
     while True:
