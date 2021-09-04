@@ -3,15 +3,12 @@ from datetime import datetime, timedelta
 from pprint import pprint
 from typing import Optional
 
-from dotenv import load_dotenv
-
 from main import run_strategy
 from strategy import Strategy
 
 
 class VolatileStrategy(Strategy):
     """A strategy that finds volatile assets and does grid trading on them"""
-
     def run(self):
         pprint(self.find_volatile_tickers())
 
