@@ -22,7 +22,7 @@ class VolatileStrategy(Strategy):
         end = now
         products = [
             p for p in self.client.get_products() if p['id'].endswith('-USD')
-        ]  # get all USD exchanges
+        ]  # filter only USD pairs
         product_variance = [
             {
                 'id': p['id'],
@@ -45,7 +45,7 @@ class VolatileStrategy(Strategy):
             abs((value - benchmark) / benchmark)
             for benchmark, value in zip(prices, prices[1:])
         ]
-        # calculate average % difference
+        # calculate average percent difference
         return statistics.mean(percent_change)
 
     def avg_percent_volatility(self,
