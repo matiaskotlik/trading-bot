@@ -1,8 +1,10 @@
+from collections import OrderedDict
 from datetime import datetime, timedelta
+import math
 from trader import Trader
 from downloader import Downloader
 from symbol import parameters
-from genetic import Gene
+from genetic import Agent, Gene
 import statistics
 from typing import Optional
 
@@ -11,24 +13,35 @@ from cbpro import AuthenticatedClient as CBProClient
 
 class Parameter:
     """Strategy parameter with output in the range [min_value, max_value)"""
-    def __init__(self, min_val: float, max_val: float):
-        self.min = min_val
-        self.max = max_val
+    DEFAULT_RANGE_PERCENTAGE = 0.5
 
-    def get_value(self, gene: Gene):
-        return self.min + gene.value * (self.max - self.min)
+    def __init__(self,
+                 initial_value: float,
+                 min_val: Optional[float] = None,
+                 max_val: Optional[float] = None):
+        default_range = (initial_value * self.DEFAULT_RANGE_PERCENTAGE)
+        self.min = min_val or initial_value - default_range
+        self.max = max_val or initial_value + default_range
+        self.value = (initial_value - self.min) / (self.max - self.min)
+
+        # make sure difference between initial_value and the result of get_value() is negligible
+        assert math.isclose(initial_value, self.get_value())
+
+    def get_value(self) -> float:
+        """Get the value of the parameter"""
+        return self.min + self.value * (self.max - self.min)
 
 
 class IntParameter(Parameter):
     """Strategy parameter where output is an integer in the range [min_value, max_value)"""
-    def get_value(self, gene: Gene):
-        return int(super().get_value(gene))
+    def get_value(self) -> int:
+        return int(super().get_value())
 
 
 class Strategy:
-    def __init__(self, now: Optional[datetime] = None):
-        self.now = now or datetime.now()
-        self.parameters: list[Parameter] = []
+    def __init__(self, start_time: Optional[datetime] = None):
+        self.start_time = start_time or datetime.now()
+        self.parameters: OrderedDict[str, Parameter] = {}
 
     def download_data(self, downloader: Downloader):
         raise NotImplementedError
@@ -36,9 +49,16 @@ class Strategy:
     def trade(self, trader: Trader):
         raise NotImplementedError
 
-    def add_parameter(self, p: Parameter) -> Parameter:
-        self.parameters.append(p)
-        return p
+    def create_agent_from_parameters(self) -> Agent:
+        return Agent([Gene(param.value) for param in self.parameters.values()])
+
+    def update_parameters_from_agent(self, agent: Agent):
+        for (gene, param) in zip(agent.genes, parameters.values()):
+            param.value = gene.value
+    
+    def print_parameters(self):
+        for name, param in parameters.items():
+            print(f'{name:10.10}: {param.value}')
 
     def avg_close_price_percent_diff(
             self, historical_data: list[dict[str, float]]) -> float:

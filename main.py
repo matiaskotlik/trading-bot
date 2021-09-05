@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import api
 from downloader import Downloader
 from strategy import Strategy
-from trader import Trader
+from trader import TestTrader
 
 
 def run_strategy(strategy_builder: Callable[[datetime], Strategy]):
@@ -15,20 +15,20 @@ def run_strategy(strategy_builder: Callable[[datetime], Strategy]):
     colorama.init()
 
     client = api.connect()
+    time = datetime(2021, 9, 3)
+    # time = datetime.now()
     downloader = Downloader(client)
-    trader = Trader(client)
-
-    time = datetime(2021, 9, 4)
+    trader = TestTrader(client, usd=100, time=time)
 
     strategy: Strategy = strategy_builder(time)
 
     print('Downloading data...')
     strategy.download_data(downloader)
 
-    print('Trading...')
+    print('Trading...\n')
+    trader.show_portfolio()
     strategy.trade(trader)
-
-    print('Done!')
+    trader.show_portfolio()
 
 
 if __name__ == '__main__':

@@ -15,12 +15,11 @@ class VolatileStrategy(Strategy):
         trader.place_order(product,
                            side=Side.BUY,
                            order_type=OrderType.MARKET,
-                           price=10,
-                           time=self.now)
+                           price=10)
 
     def download_data(self, downloader: Downloader):
-        start = self.now - timedelta(hours=1)
-        end = self.now
+        start = self.start_time - timedelta(hours=1)
+        end = self.start_time
 
         self.products = [
             p for p in downloader.product_list() if p['id'].endswith('-USD')
