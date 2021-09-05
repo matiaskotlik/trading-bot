@@ -1,6 +1,10 @@
 # Setup
 
 ```bash
+git clone git@github.com:qmatias/trading-bot.git
+
+cd trading-bot
+
 python3 -m venv venv # create a venv
 
 # activate the venv
