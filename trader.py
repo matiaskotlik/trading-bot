@@ -87,6 +87,19 @@ class Trader:
 
 
 class TestTrader(Trader):
+    def get_product_price(self, product_id) -> Decimal:
+        now = datetime.now()
+        if now < self.time:
+            raise ValueError("self.time is in the future")
+        min_difference = timedelta(minutes=1, seconds=1)
+        if self.time and min_difference < now - self.time:
+            historical_data = self.client.get_product_historic_rates(
+                product_id, start=self.time, end=self.time, granularity=60)[0]
+            unit_price = Decimal(historical_data[4])  # close price
+        else:
+            product_info = self.client.get_product_ticker(product_id)
+            unit_price = Decimal(product_info['price'])
+        return unit_price
     COINBASE_FEE = Decimal(0.005)
 
     def __init__(self,
@@ -221,7 +234,7 @@ class TestTrader(Trader):
                        fee_amount=fee,
                        order_time=self.time or datetime.now(),
                        is_real=False)
-
+    
 
 class CoinbaseTrader(Trader):
     def __init__(self, *args, **kwargs):
